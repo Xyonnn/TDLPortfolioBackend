@@ -5,8 +5,9 @@ import cors from "cors";
 import {verifyFirebaseToken} from "./middleware/auth.js";
 import dotenv from "dotenv";
 
-const appPort = 1412;
+
 const app = express();
+dotenv.config();
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
@@ -22,7 +23,11 @@ export const ConnectorDB = async () =>{
         process.exit();
     }
 };
-ConnectorDB();
+ConnectorDB().then(
+        app.listen(process.env.PORT, ()=>{
+        console.log("Something");
+    })
+);
 
 const userDBSchema = new mongoose.Schema(
     {
@@ -48,9 +53,7 @@ const toDoSchema = new mongoose.Schema(
 export const User = mongoose.model("User", userDBSchema);
 export const ToDoList = mongoose.model("ToDoList", toDoSchema);
 
-app.listen(appPort, ()=>{
-    console.log("Server port: ", appPort);
-})
+
 
 app.post("/api/register", async (req, res) =>{
 
