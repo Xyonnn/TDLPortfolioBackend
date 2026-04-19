@@ -3,6 +3,7 @@ import morgan from "morgan";
 import mongoose from "mongoose";
 import cors from "cors";
 import {verifyFirebaseToken} from "./middleware/auth.js";
+import dotenv from "dotenv";
 
 const appPort = 1412;
 const app = express();
@@ -12,7 +13,7 @@ app.use(express.json());
 
 export const ConnectorDB = async () =>{
     try{
-        await mongoose.connect("mongodb://localhost:27017");
+        await mongoose.connect(process.env.MONGO_URL);
         mongoose.set('bufferCommands', false);
         mongoose.set("strictQuery", true);
         console.log("DB connected");
