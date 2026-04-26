@@ -3,12 +3,16 @@ import morgan from "morgan";
 import mongoose from "mongoose";
 import cors from "cors";
 import {verifyFirebaseToken} from "./middleware/auth.js";
+import admin from "./firebase-admin.js";
 import dotenv from "dotenv";
 
 
 const app = express();
 dotenv.config();
-app.use(cors());
+app.use(cors({
+    origin: "https://tdl-portfolio-frontend.vercel.app",
+    credentials: true
+}));
 app.use(morgan("dev"));
 app.use(express.json());
 
@@ -121,4 +125,19 @@ app.post("/api/tasks", verifyFirebaseToken, async (req,res) =>{
         res.status(500).json({error: "Faild to save data"});
     }
 });
+
+app.post("/api/deleteAccount", verifyFirebaseToken, async (req,res)=>{
+    try{
+        const uid  = req.user.uid;
+        
+        await ToDoList.deleteMany({userId: uid});
+        await User.deleteOne({firebaseUid: uid});
+        await admin.auth().deleteUser(uid);
+
+        res.json({message: "Test user data delated mongo"});
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error: "Faild to delete data"});
+    }
+})
 
